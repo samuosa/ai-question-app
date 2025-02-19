@@ -1,0 +1,35 @@
+Analyze the provided PDF document thoroughly and extract key concepts, relationships, and relevant topics covered in the material. Your task is to generate a CSV file containing **3 open questions** and **7 multiple-choice questions** that test a deep understanding of the document.
+
+### **Instructions:**
+1. **Understand the entire document**: Identify key themes, definitions, frameworks, models, methodologies, and case studies discussed.
+2. **Derive exam questions**:
+   - Generate **Y multiple-choice questions (MCQs)** covering core ideas, technical details, and applied understanding.
+   - Generate **X open-ended questions** focusing on explanation, comparison, and application of concepts.
+3. **Ensure diversity in question difficulty**:
+   - Include both **basic conceptual questions** and **higher-order application-based questions**.
+   - Ensure **connections between topics** are tested (e.g., how concepts interrelate).
+4. **Use the language of the document** (detect if the content is in English or German, and use the same language for all questions).
+
+### **CSV Output Format:**
+Each row should follow this exact structure:
+topic;question;a;b;c;d;correctAnswer;explanation;difficulty;language
+- **topic**: The relevant topic covered in the document.
+- **question**: The exam question.
+- **a, b, c, d**: Answer choices (for MCQs only, leave empty for open-ended questions).
+- **correctAnswer**: The correct option (for MCQs only, leave empty for open-ended questions).
+- **explanation**: A brief, precise explanation of why the answer is correct or what should be included in the open-ended answer.
+- **difficulty**: Leave this field empty.
+- **language**: **"DE"** for German, **"EN"** for English (match the language of the document).
+
+### **Example Output (for a document on IT and Operations):**
+Supply Chain Management;Was ist das Hauptziel des Supply Chain Managements (SCM)?;Maximierung von Lagerbeständen;Vermeidung von Verschwendung entlang der Lieferkette;Erhöhung der Produktionskosten;Minimierung der Kundenzufriedenheit;b;Das SCM zielt darauf ab, Verschwendung in der gesamten Lieferkette zu vermeiden und Prozesse effizient zu gestalten.;;DE
+IT und Operations;Erklären Sie das Konzept des Supply Chain Managements und diskutieren Sie, wie IT-Systeme zur Optimierung der Lieferkette beitragen.;;;;;;;Die Antwort sollte die Ziele und Funktionen des SCM erläutern und aufzeigen, wie IT-Lösungen Transparenz, Planung und Steuerung in der Lieferkette verbessern.;;DE
+
+
+### **Requirements:**
+- The generated questions **must be well-structured, clear, and relevant**.
+- **Avoid generic questions**—ensure each question is directly derived from the document’s content.
+- **Ensure variety**: Some MCQs should test factual knowledge, while others assess deeper understanding.
+- **Include applied and scenario-based questions** when appropriate.
+
+---

@@ -1,0 +1,84 @@
+
+#### **Task Overview:**
+Analyze the provided **text input** thoroughly and extract key concepts, relationships, and relevant topics covered in the material. The input can contain a **summary or sample questions** that indicate the main themes and ideas. Your task is to generate a CSV file containing **3 open questions** and **7 multiple-choice questions** that test a deep understanding of the provided content.
+
+---
+
+### **Instructions:**
+1. **Understand the provided text**: Identify key themes, definitions, frameworks, models, methodologies, and case studies mentioned.
+2. **Derive exam questions**:
+   - Generate **7 multiple-choice questions (MCQs)** covering core ideas, technical details, and applied understanding.
+   - Generate **3 open-ended questions** focusing on explanation, comparison, and application of concepts.
+3. **Ensure diversity in question difficulty**:
+   - Include both **basic conceptual questions** and **higher-order application-based questions**.
+   - Ensure **connections between topics** are tested (e.g., how concepts interrelate).
+4. **Use the language of the input text** (detect if the content is in English or German, and use the same language for all questions).
+
+---
+
+### **CSV Output Format:**
+Each row should follow this exact structure:
+
+```csv
+topic;question;a;b;c;d;correctAnswer;explanation;difficulty;language
+```
+
+- **topic**: The relevant topic covered in the text.
+- **question**: The exam question.
+- **a, b, c, d**: Answer choices (for MCQs only, leave empty for open-ended questions).
+- **correctAnswer**: The correct option (for MCQs only, leave empty for open-ended questions).
+- **explanation**: A brief, precise explanation of why the answer is correct or what should be included in the open-ended answer.
+- **difficulty**: Leave this field empty.
+- **language**: **"DE"** for German, **"EN"** for English (match the language of the input text).
+
+---
+
+### **Example Output (for a text on IT and Operations):**
+
+```csv
+Supply Chain Management;Was ist das Hauptziel des Supply Chain Managements (SCM)?;Maximierung von Lagerbeständen;Vermeidung von Verschwendung entlang der Lieferkette;Erhöhung der Produktionskosten;Minimierung der Kundenzufriedenheit;b;Das SCM zielt darauf ab, Verschwendung in der gesamten Lieferkette zu vermeiden und Prozesse effizient zu gestalten.;;DE
+IT und Operations;Erklären Sie das Konzept des Supply Chain Managements und diskutieren Sie, wie IT-Systeme zur Optimierung der Lieferkette beitragen.;;;;;;;Die Antwort sollte die Ziele und Funktionen des SCM erläutern und aufzeigen, wie IT-Lösungen Transparenz, Planung und Steuerung in der Lieferkette verbessern.;;DE
+```
+
+---
+
+### **Requirements:**
+- The generated questions **must be well-structured, clear, and relevant**.
+- **Avoid generic questions**—ensure each question is directly derived from the provided text.
+- **Ensure variety**: Some MCQs should test factual knowledge, while others assess deeper understanding.
+- **Include applied and scenario-based questions** when appropriate.
+
+### **Textinput:**
+Which of these statements are true for a game with finite repetitions? 
+
+There is no endgame effect.
+
+In each period of the game, the equilibrium outcome is the same.
+
+The outcome is always the same as for a game with infinite repetitions.
+
+The players do not play a dominant strategy. 
+
+
+Which of the following statements is true?
+
+In finite games it is clear from the beginning how often the game is repeated and when it ends.
+
+In repeated games interactions between competitors always take place in endless patterns.  
+
+Repeated games are the only way to achieve cooperative behavior. 
+
+Backward induction is used to analyze repeated games with infinite repetitions.
+
+
+If the outcome of a game is determined by the fact that in the last stage of the game there is no further threat of retaliation, this is called  ___________ effect.
+
+equilibrium
+
+first- mover
+
+funnel
+
+sausage
+
+end-game 
