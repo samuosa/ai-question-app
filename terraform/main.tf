@@ -25,12 +25,34 @@ variable "region" {
   default     = "us-central1"
 }
 
+variable "firebase_site_id" {
+  description = "firebase site id"
+  type        = string
+}
+
+variable "cloud_run_service_name" {
+  description = "cloud run service name"
+  type        = string
+}
+
+variable "pubsub_topic_name" {
+  description = "pubsub topic name"
+  type        = string
+}
+
+variable "pubsub_subscription_name" {
+  description = "pubsub subscription name"
+  type        = string
+}
+
 # ---------------------------
 # Google Cloud Storage Bucket for Static Website Hosting
 # ---------------------------
+
 resource "google_storage_bucket" "static_site" {
   name          = "static-site-${var.project_id}"
-  location      = var.region
+  location      = var.region   # Correct this line
+  storage_class = "STANDARD"
   force_destroy = true
 
   website {
@@ -39,9 +61,27 @@ resource "google_storage_bucket" "static_site" {
   }
 }
 
+resource "google_storage_bucket_iam_member" "public_access" {
+  bucket = google_storage_bucket.static_site.name
+  role   = "roles/storage.objectViewer"
+  member = "allUsers"
+}
+
+output "static_site_url" {
+  value       = "http://${google_storage_bucket.static_site.name}.storage.googleapis.com"
+  description = "Public URL for the static site"
+}
+
+
 # ---------------------------
 # Cloud Run Service for Express Backend
 # ---------------------------
+# Build and push the Docker image to Google Container Registry
+#
+# docker build -t gcr.io/hip-apricot-429910-e1/express-backend:latest
+# docker push gcr.io/hip-apricot-429910-e1/express-backend:latest
+# ---------------------------
+/* 
 resource "google_cloud_run_service" "api_service" {
   name     = "express-backend"
   location = var.region
@@ -49,7 +89,35 @@ resource "google_cloud_run_service" "api_service" {
   template {
     spec {
       containers {
-        image = "gcr.io/${var.project_id}/express-backend:latest"
+        # hardcoded placeholder image, replace with your own when ready
+        image=""
+        #image = "gcr.io/${var.project_id}/express-backend:latest"
+        ports {
+          container_port = 8080
+        }
+      }
+    }
+  }
+
+  traffic {
+    percent         = 100
+    latest_revision = true
+  }
+} 
+*/
+
+resource "google_cloud_run_service" "api_service" {
+  name     = "express-backend"
+  location = var.region
+
+  template {
+    spec {
+      containers {
+        image   = "node:alpine"
+        command = ["node", "-e"]
+        args = [
+          "const http = require('http'); http.createServer((req, res) => { res.end('Hello, world!'); }).listen(8080);"
+        ]
         ports {
           container_port = 8080
         }

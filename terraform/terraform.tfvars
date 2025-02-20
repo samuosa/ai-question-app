@@ -1,4 +1,4 @@
-project_id                = "hip-apricot-429910-e1"
+project_id               = "hip-apricot-429910-e1"
 region                   = "us-central1"
 firebase_site_id         = "my-react-app"
 cloud_run_service_name   = "smart-home-backend"
