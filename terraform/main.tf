@@ -1,14 +1,6 @@
-# --------------------------------------------------------------------------------
-# Basic Terraform script to set up:
-#   1) Firebase Hosting for a React App
-#   2) Cloud Run for an Express backend
-#   3) Pub/Sub for messaging
-#
-# Replace "your-gcp-project-id" where appropriate.
-# --------------------------------------------------------------------------------
-
 terraform {
-  required_version = ">= 1.0"
+  required_version = ">= 1.0.0"
+
   required_providers {
     google = {
       source  = "hashicorp/google"
@@ -18,68 +10,88 @@ terraform {
 }
 
 provider "google" {
-  # Project & region can be overridden by environment variables or by specifying them below.
   project = var.project_id
   region  = var.region
 }
 
-################################################################################
-# Variables
-################################################################################
 variable "project_id" {
+  description = "Your GCP project ID"
   type        = string
-  description = "The GCP project ID where resources will be created"
 }
 
 variable "region" {
-  type        = string
   description = "The region to deploy resources"
+  type        = string
   default     = "us-central1"
 }
 
 variable "firebase_site_id" {
+  description = "firebase site id"
   type        = string
-  description = "Site ID for Firebase Hosting"
-  default     = "my-react-app"
 }
 
 variable "cloud_run_service_name" {
+  description = "cloud run service name"
   type        = string
-  description = "Name for the Cloud Run service"
-  default     = "smart-home-backend"
 }
 
 variable "pubsub_topic_name" {
+  description = "pubsub topic name"
   type        = string
-  description = "Name for the Pub/Sub topic"
-  default     = "smart-home-events"
 }
 
 variable "pubsub_subscription_name" {
+  description = "pubsub subscription name"
   type        = string
-  description = "Name for the Pub/Sub subscription"
-  default     = "smart-home-sub"
 }
 
-################################################################################
-# Firebase Hosting Setup (Site creation)
-################################################################################
-resource "google_firebase_hosting_site" "frontend" {
-  project = var.project_id
-  site_id = var.firebase_site_id
+# ---------------------------
+# Google Cloud Storage Bucket for Static Website Hosting
+# ---------------------------
+
+resource "google_storage_bucket" "static_site" {
+  name          = "static-site-${var.project_id}"
+  location      = var.region   # Correct this line
+  storage_class = "STANDARD"
+  force_destroy = true
+
+  website {
+    main_page_suffix = "index.html"
+    not_found_page   = "404.html"
+  }
 }
 
-################################################################################
-# Cloud Run (Express Backend)
-################################################################################
-resource "google_cloud_run_service" "backend" {
-  name     = var.cloud_run_service_name
+resource "google_storage_bucket_iam_member" "public_access" {
+  bucket = google_storage_bucket.static_site.name
+  role   = "roles/storage.objectViewer"
+  member = "allUsers"
+}
+
+output "static_site_url" {
+  value       = "http://${google_storage_bucket.static_site.name}.storage.googleapis.com"
+  description = "Public URL for the static site"
+}
+
+
+# ---------------------------
+# Cloud Run Service for Express Backend
+# ---------------------------
+# Build and push the Docker image to Google Container Registry
+#
+# docker build -t gcr.io/hip-apricot-429910-e1/express-backend:latest
+# docker push gcr.io/hip-apricot-429910-e1/express-backend:latest
+# ---------------------------
+/* 
+resource "google_cloud_run_service" "api_service" {
+  name     = "express-backend"
   location = var.region
 
   template {
     spec {
       containers {
-        image = "gcr.io/${var.project_id}/${var.cloud_run_service_name}:latest"
+        # hardcoded placeholder image, replace with your own when ready
+        image=""
+        #image = "gcr.io/${var.project_id}/express-backend:latest"
         ports {
           container_port = 8080
         }
@@ -87,50 +99,65 @@ resource "google_cloud_run_service" "backend" {
     }
   }
 
-  # Allow public (unauthenticated) access.
-  autogenerate_revision_name = true
+  traffic {
+    percent         = 100
+    latest_revision = true
+  }
+} 
+*/
+
+resource "google_cloud_run_service" "api_service" {
+  name     = "express-backend"
+  location = var.region
+
+  template {
+    spec {
+      containers {
+        image   = "node:alpine"
+        command = ["node", "-e"]
+        args = [
+          "const http = require('http'); http.createServer((req, res) => { res.end('Hello, world!'); }).listen(8080);"
+        ]
+        ports {
+          container_port = 8080
+        }
+      }
+    }
+  }
+
+  traffic {
+    percent         = 100
+    latest_revision = true
+  }
 }
 
-# Enable public access to the Cloud Run service
-resource "google_cloud_run_service_iam_member" "noauth" {
-  location       = google_cloud_run_service.backend.location
-  project        = var.project_id
-  service        = google_cloud_run_service.backend.name
-  role           = "roles/run.invoker"
-  member         = "allUsers"
+# ---------------------------
+# Pub/Sub Topic and Subscription
+# ---------------------------
+resource "google_pubsub_topic" "my_topic" {
+  name = "my-topic"
 }
 
-################################################################################
-# Pub/Sub Topic & Subscription
-################################################################################
-resource "google_pubsub_topic" "smart_home" {
-  name = var.pubsub_topic_name
+resource "google_pubsub_subscription" "my_subscription" {
+  name  = "my-subscription"
+  topic = google_pubsub_topic.my_topic.name
 }
 
-resource "google_pubsub_subscription" "smart_home_subscription" {
-  name  = var.pubsub_subscription_name
-  topic = google_pubsub_topic.smart_home.name
-}
-
-################################################################################
+# ---------------------------
 # Outputs
-################################################################################
-output "firebase_site_id" {
-  description = "Site ID for Firebase Hosting"
-  value       = google_firebase_hosting_site.frontend.site_id
+# ---------------------------
+output "static_site_endpoint" {
+  # The website endpoint follows the pattern: http://<bucket-name>.storage.googleapis.com
+  value       = "http://${google_storage_bucket.static_site.name}.storage.googleapis.com"
+  description = "Endpoint for static website hosting"
 }
 
 output "cloud_run_url" {
-  description = "Cloud Run URL for the Express Backend"
-  value       = google_cloud_run_service.backend.status[0].url
+  value       = google_cloud_run_service.api_service.status[0].url
+  description = "URL of the Cloud Run service"
 }
 
 output "pubsub_topic" {
+  value       = google_pubsub_topic.my_topic.name
   description = "Pub/Sub topic name"
-  value       = google_pubsub_topic.smart_home.name
-}
-
-output "pubsub_subscription" {
-  description = "Pub/Sub subscription name"
-  value       = google_pubsub_subscription.smart_home_subscription.name
 }
