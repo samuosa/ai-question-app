@@ -1,0 +1,122 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # Job to filter which directories have changed
+  filter:
+    runs-on: ubuntu-latest
+    outputs:
+      terraform: ${{ steps.filter.outputs.terraform }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      backend: ${{ steps.filter.outputs.backend }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Determine changed paths
+        id: filter
+        uses: dorny/paths-filter@v2
+        with:
+          filters: |
+            terraform:
+              - 'terraform/**'
+            frontend:
+              - 'frontend/**'
+            backend:
+              - 'backend/**'
+
+  # Job to run Terraform commands for GCP infrastructure deployment
+  terraform:
+    name: Deploy GCP Infrastructure with Terraform
+    runs-on: ubuntu-latest
+    needs: filter
+    if: ${{ needs.filter.outputs.terraform == 'true' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: '1.5.0'  # Use your desired Terraform version
+
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v0.6.0
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Terraform Init
+        working-directory: ./terraform
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: ./terraform
+        run: terraform plan -var="project_id=${{ secrets.GCP_PROJECT_ID }}" -var="region=us-central1"
+
+      - name: Terraform Apply
+        working-directory: ./terraform
+        run: terraform apply -auto-approve -var="project_id=${{ secrets.GCP_PROJECT_ID }}" -var="region=us-central1"
+
+  # Job to build and deploy the frontend (React)
+  frontend:
+    name: Deploy Frontend
+    runs-on: ubuntu-latest
+    needs: filter
+    if: ${{ needs.filter.outputs.frontend == 'true' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install dependencies and build frontend
+        working-directory: ./frontend
+        run: |
+          npm install
+          npm run build
+
+      - name: Deploy to GCS
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          # Replace 'your-frontend-bucket' with your actual bucket name
+          gsutil -m rsync -r ./frontend/build gs://your-frontend-bucket
+
+  # Job to build and deploy the backend (Express)
+  backend:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+    needs: filter
+    if: ${{ needs.filter.outputs.backend == 'true' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build Docker image for backend
+        working-directory: ./backend
+        run: |
+          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/backend:latest .
+
+      - name: Push Docker image
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/backend:latest
+
+      - name: Deploy to Cloud Run
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          gcloud run deploy backend-service \
+            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/backend:latest \
+            --region us-central1 \
+            --platform managed \
+            --allow-unauthenticated
