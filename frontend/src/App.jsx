@@ -8,6 +8,8 @@ import Toast from "./components/Toast";
 import { generateCSV, parseCSV, shuffleArray } from "./utils";
 import LanguageFilter from "./components/LanguageFilter";
 import QuestionTypeFilter from "./components/QuestionsTypeFilter";
+import PdfMultiParser from "./components/PdfParser";
+import GenerateQuestionsForm from "./components/GenerateQuestionsForm";
 //import GenerateQuestions from "./components/GenerateQuestions";
 
 
@@ -46,6 +48,10 @@ export default function App() {
 
   // Key to force re-render of question card to reset highlights
   const [renderKey, setRenderKey] = useState(0);
+
+  //Parsed pdfs
+  const [parsed,setParsed]=useState(false)
+  const [pdfContent,setPdfContent]=useState("")
 
   /** Fetch CSV on mount */
   useEffect(() => {
@@ -283,6 +289,19 @@ export default function App() {
 
       {/* Toast for success/wrong answer */}
       <Toast toastMsg={toastMsg} toastType={toastType} />
+      <PdfMultiParser onParsed={e=>{
+        console.log(e)
+        if(e.length>10){
+          setParsed(true)
+          setPdfContent(e)
+        }
+      }}/>
+      {parsed&&(
+        <div className="">
+          <p> generate questions for pdf?</p>
+          <GenerateQuestionsForm apiToken="dsafvyd" textContent={pdfContent} onResponse={e=>console.log(e)}/>
+        </div>
+      )}
     </div>
   );
 }
