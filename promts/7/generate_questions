@@ -1,0 +1,22 @@
+your task is to read the following Questions (marked with ## Questions) and generate a CSV as in The ## Template of the form
+
+## Template
+topic;question;a;b;c;d;correctAnswer;explanation;difficulty;language
+- "topic": topic should be detected
+- "question": question should be copied
+- "a,b,c,d": if Multiple Options are provided they should be copied to to columns: a,b,c,d otherwise leave blank
+- "correctAnswer": if Multiple options were provided insert correct option by cell name e.g. [a,b,c,d]. if correct opion is given in Question just copy it if not think extra hard to deduce it. if no options are given leave blank
+- "explanation": if explanation is provided copy it otherwise think carefully and explain the question yourself
+- "difficulty": rate the difficulty your self
+- "language": the language of the question
+
+## Example
+topic;question;a;b;c;d;correctAnswer;explanation;difficulty;language
+Context-Sensitive Languages;What is true about membership testing for CSL?;It is decidable in PSPACE;It is undecidable;It is solvable in logarithmic space;It is NP-complete;a;Membership for CSL is PSPACE-complete because LBAs use linear space and NSPACE(n)=PSPACE.;hard;EN
+Context-Sensitive Languages;Which statement is correct about CSL in the Chomsky hierarchy?;They are more powerful than CFL but less powerful than recursive languages.;They are less powerful than CFL.;They coincide with recursive enumerable languages.;They are the smallest class.;a;CSL (Type-1) strictly include CFL (Type-2) and are strictly contained in recursive languages (Type-0 decidable).;easy;EN
+Chomsky Hierarchy;Which grammar type corresponds exactly to regular languages?;Type-0;Type-1;Type-2;Type-3;d;Type-3 grammars generate regular languages, equivalent to DFAs and NFAs.;easy;EN
+Chomsky Hierarchy;Which language class is recognized by pushdown automata?;Regular;Context-free;Context-sensitive;Recursively enumerable;b;Context-free languages correspond exactly to nondeterministic pushdown automata.;easy;EN
+Crowd Work;Welche Risiken ergeben sich für Arbeitnehmer durch Crowd Work?;;;;;;Antwort sollte auf Aspekte wie fehlende soziale Absicherung, unsichere Einkommen und algorithmische Kontrolle eingehen.;;DE
+
+
+## Questions
