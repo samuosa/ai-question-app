@@ -56,7 +56,7 @@ resource "google_storage_bucket" "static_site" {
   force_destroy = true
 
   website {
-    main_page_suffix = "index.html"
+    main_page_suffix = "home.html"
     not_found_page   = "404.html"
   }
 }
