@@ -58,16 +58,17 @@ You can set these in a `terraform.tfvars` file or pass them as command-line argu
 ### Resources Deployed
 
 1. **Google Cloud Storage Bucket**
+
    - **Name:** `static-site-<project_id>`
    - **Configuration:** Set for static website hosting with `index.html` as the main page and `404.html` for not found errors.
    - **Note:** You need to upload your React build files (e.g., contents of the `build` directory) to this bucket. For public access, adjust the bucket’s IAM policy.
-
 2. **Cloud Run Service**
+
    - **Name:** `express-backend`
    - **Image:** Expects a container image at `gcr.io/<project_id>/express-backend:latest`. Ensure your Express app is containerized and pushed to this location.
    - **Traffic:** All traffic routes to the latest revision.
-
 3. **Pub/Sub Topic and Subscription**
+
    - **Topic Name:** `my-topic`
    - **Subscription Name:** `my-subscription`
    - These resources are automatically created and can be used for messaging between your services.
@@ -82,51 +83,46 @@ You can set these in a `terraform.tfvars` file or pass them as command-line argu
    git clone <repository_url>
    cd <repository_directory>
    ```
-
 2. **Initialize Terraform**
 
    ```bash
    terraform init
    ```
-
 3. **Review the Terraform Plan**
 
    Replace `hip-apricot-429910-e1` and `your-region` with your actual project ID and desired region:
 
    ```bash
-   terraform plan -var="project_id=hip-apricot-429910-e1" -var="us-central1"
+   terraform plan -var="project_id=hip-apricot-429910-e1" -var="region=us-central1"
    ```
-
 4. **Apply the Configuration**
 
    ```bash
-   terraform apply -var="project_id=hip-apricot-429910-e1" -var="us-central1"
+   terraform apply -var="project_id=hip-apricot-429910-e1" -var="region=us-central1"
    ```
 
    Confirm the prompt to proceed. Terraform will create the Cloud Storage bucket, Cloud Run service, and Pub/Sub resources.
-
 5. **Post-Deployment Configuration**
 
    - **Cloud Storage Bucket (Static Website):**
+
      - **Upload Files:** Upload your React app’s build files (e.g., `index.html`, `404.html`, and other assets) to the bucket. You can use the `gsutil` tool:
 
        ```bash
        gsutil -m cp -r build/* gs://static-site-hip-apricot-429910-e1
        ```
-
      - **Set Public Read Access (if needed):**
 
        ```bash
        gsutil iam ch allUsers:objectViewer gs://static-site-hip-apricot-429910-e1
        ```
-
      - **Access the Website:** Visit the URL provided by the output:
 
        ```
        http://static-site-hip-apricot-429910-e1.storage.googleapis.com/index.html
        ```
-
    - **Cloud Run Service (Express Backend):**
+
      - **Build and Push Your Container Image:**
 
        ```bash
@@ -136,10 +132,9 @@ You can set these in a `terraform.tfvars` file or pass them as command-line argu
        # Push the image to Google Container Registry
        docker push gcr.io/hip-apricot-429910-e1/express-backend:latest
        ```
-
      - **Deployment:** The Cloud Run service will pick up the new image on the next Terraform apply. You may also trigger a new deployment manually via the Cloud Run console if needed.
-
    - **Pub/Sub:**
+
      - Use the created Pub/Sub topic and subscription within your application as needed.
 
 ---
