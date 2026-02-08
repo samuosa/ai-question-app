@@ -56,7 +56,7 @@ resource "google_storage_bucket" "static_site" {
   force_destroy = true
 
   website {
-    main_page_suffix = "index.html"
+    main_page_suffix = "home.html"
     not_found_page   = "404.html"
   }
 }
@@ -106,30 +106,30 @@ resource "google_cloud_run_service" "api_service" {
 } 
 */
 
-resource "google_cloud_run_service" "api_service" {
-  name     = "express-backend"
-  location = var.region
+# resource "google_cloud_run_service" "api_service" {
+#   name     = "express-backend"
+#   location = var.region
 
-  template {
-    spec {
-      containers {
-        image   = "node:alpine"
-        command = ["node", "-e"]
-        args = [
-          "const http = require('http'); http.createServer((req, res) => { res.end('Hello, world!'); }).listen(8080);"
-        ]
-        ports {
-          container_port = 8080
-        }
-      }
-    }
-  }
+#   template {
+#     spec {
+#       containers {
+#         image   = "node:alpine"
+#         command = ["node", "-e"]
+#         args = [
+#           "const http = require('http'); http.createServer((req, res) => { res.end('Hello, world!'); }).listen(8080);"
+#         ]
+#         ports {
+#           container_port = 8080
+#         }
+#       }
+#     }
+#   }
 
-  traffic {
-    percent         = 100
-    latest_revision = true
-  }
-}
+#   traffic {
+#     percent         = 100
+#     latest_revision = true
+#   }
+# }
 
 # ---------------------------
 # Pub/Sub Topic and Subscription
@@ -152,10 +152,10 @@ output "static_site_endpoint" {
   description = "Endpoint for static website hosting"
 }
 
-output "cloud_run_url" {
-  value       = google_cloud_run_service.api_service.status[0].url
-  description = "URL of the Cloud Run service"
-}
+# output "cloud_run_url" {
+#   value       = google_cloud_run_service.api_service.status[0].url
+#   description = "URL of the Cloud Run service"
+# }
 
 output "pubsub_topic" {
   value       = google_pubsub_topic.my_topic.name

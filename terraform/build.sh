@@ -14,6 +14,7 @@ echo "Building React app..."
 cd ../frontend
 npm install
 npm run build
+cp ./build/index.html ./build/home.html
 
 # Step 2: Return to terraform directory
 cd "$TERRAFORM_DIR"
@@ -24,7 +25,8 @@ echo "Extracting bucket name from Terraform output..."
 BUCKET_URL=$(terraform output -raw static_site_url)
 if [ -z "$BUCKET_URL" ]; then
   echo "Error: static_site_url output not found. Please run 'terraform apply' first."
-  exit 1
+  BUCKET_URL="http://static-site-hip-apricot-429910-e1.storage.googleapis.com"
+  # exit 1
 fi
 
 # Remove the protocol prefix and the storage.googleapis.com suffix to get the bucket name
