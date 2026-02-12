@@ -21,11 +21,11 @@ cd "$TERRAFORM_DIR"
 
 # Step 3: Extract the bucket name from Terraform output
 echo "Extracting bucket name from Terraform output..."
-# The Terraform output should be like: "http://static-site-<project-id>.storage.googleapis.com"
+# The Terraform output should be like: "http://static-site-2-<project-id>.storage.googleapis.com"
 BUCKET_URL=$(terraform output -raw static_site_url)
 if [ -z "$BUCKET_URL" ]; then
   echo "Error: static_site_url output not found. Please run 'terraform apply' first."
-  BUCKET_URL="http://static-site-hip-apricot-429910-e1.storage.googleapis.com"
+  BUCKET_URL="http://static-site-2-hip-apricot-429910-e1.storage.googleapis.com"
   # exit 1
 fi
 
