@@ -59,7 +59,7 @@ You can set these in a `terraform.tfvars` file or pass them as command-line argu
 
 1. **Google Cloud Storage Bucket**
 
-   - **Name:** `static-site-<project_id>`
+   - **Name:** `static-site-2-<project_id>`
    - **Configuration:** Set for static website hosting with `index.html` as the main page and `404.html` for not found errors.
    - **Note:** You need to upload your React build files (e.g., contents of the `build` directory) to this bucket. For public access, adjust the bucket’s IAM policy.
 2. **Cloud Run Service**
@@ -109,17 +109,17 @@ You can set these in a `terraform.tfvars` file or pass them as command-line argu
      - **Upload Files:** Upload your React app’s build files (e.g., `index.html`, `404.html`, and other assets) to the bucket. You can use the `gsutil` tool:
 
        ```bash
-       gsutil -m cp -r build/* gs://static-site-hip-apricot-429910-e1
+       gsutil -m cp -r build/* gs://static-site-2-hip-apricot-429910-e1
        ```
      - **Set Public Read Access (if needed):**
 
        ```bash
-       gsutil iam ch allUsers:objectViewer gs://static-site-hip-apricot-429910-e1
+       gsutil iam ch allUsers:objectViewer gs://static-site-2-hip-apricot-429910-e1
        ```
      - **Access the Website:** Visit the URL provided by the output:
 
        ```
-       http://static-site-hip-apricot-429910-e1.storage.googleapis.com/index.html
+       http://static-site-2-hip-apricot-429910-e1.storage.googleapis.com/index.html
        ```
    - **Cloud Run Service (Express Backend):**
 

@@ -11,7 +11,7 @@ npm install
 npm run build
 cp ./build/index.html ./build/home.html
 
-BUCKET_URL="http://static-site-hip-apricot-429910-e1.storage.googleapis.com"
+BUCKET_URL="http://static-site-2-hip-apricot-429910-e1.storage.googleapis.com"
 
 # Remove the protocol prefix and the storage.googleapis.com suffix to get the bucket name
 BUCKET_NAME=$(echo "$BUCKET_URL" | sed -e 's|http://||' -e 's|\.storage\.googleapis\.com||')

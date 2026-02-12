@@ -50,7 +50,7 @@ variable "pubsub_subscription_name" {
 # ---------------------------
 
 resource "google_storage_bucket" "static_site" {
-  name          = "static-site-${var.project_id}"
+  name          = "static-site-2-${var.project_id}"
   location      = var.region   # Correct this line
   storage_class = "STANDARD"
   force_destroy = true
