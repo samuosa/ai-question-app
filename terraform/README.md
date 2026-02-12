@@ -91,14 +91,15 @@ You can set these in a `terraform.tfvars` file or pass them as command-line argu
 3. **Review the Terraform Plan**
 
    Replace `hip-apricot-429910-e1` and `your-region` with your actual project ID and desired region:
-
+  
    ```bash
-   terraform plan -var="project_id=hip-apricot-429910-e1" -var="region=us-central1"
+   terraform plan -var="project_id=$(gcloud config get-value project)" -var="region=$(gcloud config get-value compute/region)"
+
    ```
 4. **Apply the Configuration**
 
    ```bash
-   terraform apply -var="project_id=hip-apricot-429910-e1" -var="region=us-central1"
+   terraform apply -var="project_id=$(gcloud config get-value project)" -var="region=$(gcloud config get-value compute/region)"
    ```
 
    Confirm the prompt to proceed. Terraform will create the Cloud Storage bucket, Cloud Run service, and Pub/Sub resources.
@@ -144,7 +145,7 @@ You can set these in a `terraform.tfvars` file or pass them as command-line argu
 To remove all deployed resources, run:
 
 ```bash
-terraform destroy -var="project_id=hip-apricot-429910-e1" -var="us-central1"
+terraform destroy -var="project_id=$(gcloud config get-value project)" -var="us-central1"
 ```
 
 ---
